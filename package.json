@@ -1,0 +1,22 @@
+{
+  "name": "iiif-image-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "fesk-start",
+    "build": "fesk-build",
+    "watch": "fesk-watch"
+  },
+  "devDependencies": {
+    "@fesk/scripts": "^1.1.0",
+    "@types/mathjs": "^4.4.1"
+  },
+  "dependencies": {
+    "map-the-tiles": "^1.2.1",
+    "mathjs": "^5.1.1",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "webpack-config": "^7.5.0"
+  }
+}

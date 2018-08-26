@@ -121,33 +121,32 @@ class App extends Component {
                 }}
               >
                 <PoseGroup>
-                  {scale(this.state.zoom / 100)(
-                    translate(this.state.translateX, this.state.translateY)(
-                      displayMatrix
+                  <Container key={this.state.currentScaleFactor}>
+                    {scale(this.state.zoom / 100)(
+                      translate(this.state.translateX, this.state.translateY)(
+                        displayMatrix
+                      )
                     )
-                  )
-                    .toArray()
-                    .map((row, rowId) =>
-                      row.map(([x, y, width, height], cellId) => (
-                        <Container
-                          key={`${rowId}-${cellId}-${
-                            this.state.currentScaleFactor
-                          }`}
-                          style={{
-                            position: 'absolute',
-                            left: x,
-                            top: y,
-                            width: width,
-                            height: height,
-                          }}
-                        >
-                          <img
-                            style={{ width: '100%' }}
-                            src={createImage(rowId, cellId)}
-                          />
-                        </Container>
-                      ))
-                    )}
+                      .toArray()
+                      .map((row, rowId) =>
+                        row.map(([x, y, width, height], cellId) => (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              left: x,
+                              top: y,
+                              width: width,
+                              height: height,
+                            }}
+                          >
+                            <img
+                              style={{ width: '100%' }}
+                              src={createImage(rowId, cellId)}
+                            />
+                          </div>
+                        ))
+                      )}
+                  </Container>
                 </PoseGroup>
               </div>
             </div>

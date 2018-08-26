@@ -2,9 +2,17 @@ import React, { Component } from 'react';
 import MapTheTiles from 'map-the-tiles';
 import * as math from 'mathjs';
 import TileSourceProvider from '../TileSourceProvider/TileSourceProvider';
+import posed, { PoseGroup } from 'react-pose';
+
+const Container = posed.div({
+  enter: { opacity: 1, beforeChildren: 300 },
+  exit: { opacity: 0, delay: 300 },
+});
 
 class App extends Component {
   state = {
+    activeTileSource: 'https://view.nls.uk/iiif/7443/74438561.5/info.json',
+    inputValue: 'https://view.nls.uk/iiif/7443/74438561.5/info.json',
     currentScaleFactor: null,
     translateX: 0,
     translateY: 0,
@@ -18,10 +26,28 @@ class App extends Component {
   render() {
     return (
       <div>
+        <input
+          type="text"
+          value={this.state.inputValue}
+          onChange={e => this.setState({ inputValue: e.currentTarget.value })}
+        />
+        <button
+          onClick={() =>
+            this.setState({
+              activeTileSource: this.state.inputValue,
+              currentScaleFactor: null,
+              translateX: 0,
+              translateY: 0,
+              zoom: 100,
+            })
+          }
+        >
+          Load tile-source
+        </button>
         <TileSourceProvider
           displayWidth={650}
           scaleFactor={this.state.currentScaleFactor}
-          imageService="https://view.nls.uk/iiif/7443/74438561.5/info.json"
+          imageService={this.state.activeTileSource}
         >
           {({
             displayMatrix,
@@ -62,7 +88,7 @@ class App extends Component {
                 <input
                   type="range"
                   min={50}
-                  max={300}
+                  max={(scaleFactors.length - 2) * 100}
                   value={this.state.zoom}
                   onChange={e =>
                     this.setState({
@@ -94,30 +120,35 @@ class App extends Component {
                   overflow: 'hidden',
                 }}
               >
-                {scale(this.state.zoom / 100)(
-                  translate(this.state.translateX, this.state.translateY)(
-                    displayMatrix
+                <PoseGroup>
+                  {scale(this.state.zoom / 100)(
+                    translate(this.state.translateX, this.state.translateY)(
+                      displayMatrix
+                    )
                   )
-                )
-                  .toArray()
-                  .map((row, rowId) =>
-                    row.map(([x, y, width, height], cellId) => (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          left: x,
-                          top: y,
-                          width: width,
-                          height: height,
-                        }}
-                      >
-                        <img
-                          style={{ width: '100%' }}
-                          src={createImage(rowId, cellId)}
-                        />
-                      </div>
-                    ))
-                  )}
+                    .toArray()
+                    .map((row, rowId) =>
+                      row.map(([x, y, width, height], cellId) => (
+                        <Container
+                          key={`${rowId}-${cellId}-${
+                            this.state.currentScaleFactor
+                          }`}
+                          style={{
+                            position: 'absolute',
+                            left: x,
+                            top: y,
+                            width: width,
+                            height: height,
+                          }}
+                        >
+                          <img
+                            style={{ width: '100%' }}
+                            src={createImage(rowId, cellId)}
+                          />
+                        </Container>
+                      ))
+                    )}
+                </PoseGroup>
               </div>
             </div>
           )}

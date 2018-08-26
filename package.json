@@ -17,6 +17,7 @@
     "mathjs": "^5.1.1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
+    "react-pose": "^3.0.2",
     "webpack-config": "^7.5.0"
   }
 }

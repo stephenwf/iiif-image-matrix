@@ -118,6 +118,7 @@ class App extends Component {
                     Quality {k}
                   </button>
                 ))}
+                <br />
                 {this.state.useCanvas ? (
                   <CanvasRenderer
                     displayWidth={displayWidth}

@@ -12,7 +12,7 @@ image and all of the tiles (scaled up to the size of the original image). This
 is the `Tile Matrix`.
 
 This matrix for 6 tiles in a 2x3 looks something like this:
-```
+```js
 const tileMatrix = [
   [[0, 0, 256, 256], [0, 256, 256, 211]],
   [[256, 0, 256, 256], [256, 256, 256, 211]],
@@ -26,7 +26,7 @@ The next step of the pipe is to create a canvas representation of these units,
 basically scaling them up by how much they have been scaled down. This is the `Canvas Matrix`.
 
 For the above example, the following is produced:
-```
+```js
 const canvasMatrix = [
   [[0, 0, 1024, 1024], [0, 1024, 1024, 844]],
   [[1024, 0, 1024, 1024], [1024, 1024, 1024, 844]],
@@ -42,7 +42,7 @@ upon it. This is the `Display matrix`. Currently this takes in a display width, 
 fixed width "render-able" set of boxes.
 
 Our example above, rendered at a constrained width of 650px comes out as:
-```
+```js
 const displayMatrix = [
   [[0, 0, 266.24, 266.24], [0, 266.24, 266.24, 219.44]],
   [[266.24, 0, 266.24, 266.24], [266.24, 266.24, 266.24, 219.44]],

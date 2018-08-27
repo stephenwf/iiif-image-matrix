@@ -138,7 +138,7 @@ class TileSourceProvider extends Component {
       currentHeight,
       currentScaleFactor,
     } = this.state;
-    const { children, scaleFactor } = this.props;
+    const { children, scaleFactor, displayWidth } = this.props;
 
     return children({
       id,
@@ -147,6 +147,8 @@ class TileSourceProvider extends Component {
       currentWidth,
       currentHeight,
       currentScaleFactor,
+      displayWidth: displayWidth,
+      displayHeight: currentHeight * (displayWidth / currentWidth),
       matrix,
       displayMatrix,
       imageResourceMatrix,

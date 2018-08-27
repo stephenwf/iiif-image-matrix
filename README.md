@@ -90,7 +90,7 @@ config         Image service
 ### Road map
 * Filter out tiles that are not visible from the display matrix
 * Automatically change the `tileScale` based on the zoom
-* Add example of canvas render target
+* [x] Add example of canvas render target
 * Add example of WebGL render target
 * Add skew/rotate transforms (with CSS adapter for base demo)
 * Add dragging and scroll interactions on demo-site

@@ -1,13 +1,7 @@
 import React, { Component } from 'react';
-import MapTheTiles from 'map-the-tiles';
-import * as math from 'mathjs';
 import TileSourceProvider from '../TileSourceProvider/TileSourceProvider';
-import posed, { PoseGroup } from 'react-pose';
-
-const Container = posed.div({
-  enter: { opacity: 1, beforeChildren: 300 },
-  exit: { opacity: 0, delay: 300 },
-});
+import CanvasRenderer from '../CanvasRenderer/CanvasRenderer';
+import ImageRenderer from '../ImageRenderer/ImageRenderer';
 
 class App extends Component {
   state = {
@@ -17,6 +11,7 @@ class App extends Component {
     translateX: 0,
     translateY: 0,
     zoom: 100,
+    useCanvas: false,
   };
 
   setNewScaleFactor = k => {
@@ -44,6 +39,16 @@ class App extends Component {
         >
           Load tile-source
         </button>
+        <label htmlFor="useCanvas">
+          <input
+            type="checkbox"
+            id="useCanvas"
+            value={this.state.useCanvas}
+            onChange={() => this.setState({ useCanvas: !this.state.useCanvas })}
+          />
+          Use Canvas
+        </label>
+
         <TileSourceProvider
           displayWidth={650}
           scaleFactor={this.state.currentScaleFactor}
@@ -57,6 +62,8 @@ class App extends Component {
             translate,
             scale,
             createImage,
+            displayWidth,
+            displayHeight,
           }) => (
             <div>
               <div
@@ -111,43 +118,30 @@ class App extends Component {
                     Quality {k}
                   </button>
                 ))}
-              </div>
-              <div
-                style={{
-                  position: 'relative',
-                  width: 650,
-                  height: 650,
-                  overflow: 'hidden',
-                }}
-              >
-                <PoseGroup>
-                  <Container key={this.state.currentScaleFactor}>
-                    {scale(this.state.zoom / 100)(
+                {this.state.useCanvas ? (
+                  <CanvasRenderer
+                    displayWidth={displayWidth}
+                    displayHeight={displayHeight}
+                    createImage={createImage}
+                    displayMatrix={scale(this.state.zoom / 100)(
                       translate(this.state.translateX, this.state.translateY)(
                         displayMatrix
                       )
-                    )
-                      .toArray()
-                      .map((row, rowId) =>
-                        row.map(([x, y, width, height], cellId) => (
-                          <div
-                            style={{
-                              position: 'absolute',
-                              left: x,
-                              top: y,
-                              width: width,
-                              height: height,
-                            }}
-                          >
-                            <img
-                              style={{ width: '100%' }}
-                              src={createImage(rowId, cellId)}
-                            />
-                          </div>
-                        ))
-                      )}
-                  </Container>
-                </PoseGroup>
+                    )}
+                  />
+                ) : (
+                  <ImageRenderer
+                    currentScaleFactor={this.state.currentScaleFactor}
+                    displayWidth={displayWidth}
+                    displayHeight={displayHeight}
+                    createImage={createImage}
+                    displayMatrix={scale(this.state.zoom / 100)(
+                      translate(this.state.translateX, this.state.translateY)(
+                        displayMatrix
+                      )
+                    )}
+                  />
+                )}
               </div>
             </div>
           )}

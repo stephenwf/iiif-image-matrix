@@ -13,6 +13,7 @@
     "@types/mathjs": "^4.4.1"
   },
   "dependencies": {
+    "@gfodor/react-canvas": "https://github.com/gfodor/react-canvas.git",
     "map-the-tiles": "^1.2.1",
     "mathjs": "^5.1.1",
     "react": "^16.4.2",

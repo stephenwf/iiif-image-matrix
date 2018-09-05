@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import MapTheTiles from 'map-the-tiles';
 import * as math from 'mathjs';
+import { displayMatrix, scale } from '../../transforms';
 
 class TileSourceProvider extends Component {
   componentDidMount() {
@@ -67,22 +68,29 @@ class TileSourceProvider extends Component {
       const tilesX = Math.ceil(fullWidth / tileSet.width);
       const tilesY = Math.ceil(fullHeight / tileSet.height);
 
-      const matrix = math.zeros(tilesX, tilesY, 4).map((value, [x, y, z]) => {
+      const matrix = math.zeros(tilesX, tilesY, 5).map((value, [x, y, z]) => {
         const rx = x * tileSet.width;
         const ry = y * tileSet.height;
         switch (z) {
+          // x
           case 0:
             return rx;
+          // y
           case 1:
             return ry;
+          // height
           case 2:
             return rx + tileSet.width < fullWidth
               ? tileSet.width
               : fullWidth - rx;
+          // width
           case 3:
             return ry + tileSet.height < fullHeight
               ? tileSet.height
               : fullHeight - ry;
+          // Should render
+          case 4:
+            return 1;
         }
       });
 
@@ -104,29 +112,12 @@ class TileSourceProvider extends Component {
         : scaleFactorMatrices[scaleFactorMatrices.length - 1];
 
     this.setState({
+      currentScaleFactor: scaleFactor,
       currentWidth: fullWidth,
       currentHeight: fullHeight,
       matrix,
-      imageResourceMatrix: matrix.map(value => value * scaleFactor),
-      displayMatrix: matrix.map(value => {
-        return value * (displayWidth / fullWidth);
-      }),
     });
   }
-
-  translate = (x, y) => matrix =>
-    matrix.map((value, [x1, y1, v]) => {
-      switch (v) {
-        case 0: // x
-          return value + x;
-        case 1: // y
-          return value + y;
-        default:
-          return value;
-      }
-    });
-
-  scale = factor => matrix => matrix.map(value => value * factor);
 
   makeIIIFResource = ({ x, y, width, height, region, tileWidth }) => {
     return `${
@@ -150,13 +141,13 @@ class TileSourceProvider extends Component {
       id,
       scaleFactors,
       matrix,
-      imageResourceMatrix,
-      displayMatrix,
       currentWidth,
       currentHeight,
       currentScaleFactor,
     } = this.state;
     const { children, scaleFactor, displayWidth } = this.props;
+
+    const imageResourceMatrix = scale(currentScaleFactor).transform(matrix);
 
     return children({
       id,
@@ -165,15 +156,12 @@ class TileSourceProvider extends Component {
       currentWidth,
       currentHeight,
       currentScaleFactor,
-      displayWidth: displayWidth,
+      displayWidth,
       displayHeight: currentHeight
         ? currentHeight * (displayWidth / currentWidth)
         : 0,
       matrix,
-      displayMatrix,
       imageResourceMatrix,
-      translate: this.translate,
-      scale: this.scale,
       makeIIIFResource: this.makeIIIFResource,
       createImage: (rowId, cellId) =>
         this.makeIIIFResource({

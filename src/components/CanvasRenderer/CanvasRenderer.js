@@ -10,21 +10,23 @@ class CanvasRenderer extends Component {
       createImage,
     } = this.props;
     return (
-      <Surface width={displayWidth} height={displayHeight}>
-        {displayMatrix.toArray().map((row, rowId) =>
-          row.map(([x, y, width, height], cellId) => (
-            <Image
-              src={createImage(rowId, cellId)}
-              style={{
-                left: x,
-                top: y,
-                width: width,
-                height: height,
-              }}
-            />
-          ))
-        )}
-      </Surface>
+      <div style={{ width: 'auto', height: 'auto' }}>
+        <Surface width={displayWidth} height={displayHeight}>
+          {displayMatrix.toArray().map((row, rowId) =>
+            row.map(([x, y, width, height, shouldRender], cellId) => (
+              <Image
+                src={shouldRender ? createImage(rowId, cellId) : null}
+                style={{
+                  left: x,
+                  top: y,
+                  width: width,
+                  height: height,
+                }}
+              />
+            ))
+          )}
+        </Surface>
+      </div>
     );
   }
 }

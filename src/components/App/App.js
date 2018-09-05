@@ -2,6 +2,15 @@ import React, { Component } from 'react';
 import TileSourceProvider from '../TileSourceProvider/TileSourceProvider';
 import CanvasRenderer from '../CanvasRenderer/CanvasRenderer';
 import ImageRenderer from '../ImageRenderer/ImageRenderer';
+import MouseTracker from '../MouseTracker/MouseTracker';
+import {
+  compose,
+  displayMatrix,
+  filter,
+  inverse,
+  scale,
+  translate,
+} from '../../transforms';
 
 class App extends Component {
   state = {
@@ -55,97 +64,129 @@ class App extends Component {
           imageService={this.state.activeTileSource}
         >
           {({
-            displayMatrix,
+            matrix,
             imageResourceMatrix,
             makeIIIFResource,
+            currentWidth,
             scaleFactors,
-            translate,
-            scale,
             createImage,
             displayWidth,
             displayHeight,
-          }) => (
-            <div>
-              <div
-                style={{ position: 'relative', zIndex: 10, background: '#fff' }}
-              >
-                X:{' '}
-                <input
-                  type="range"
-                  min={-500}
-                  max={500}
-                  onChange={e =>
-                    this.setState({
-                      translateX: parseInt(e.currentTarget.value, 10),
-                    })
-                  }
-                />
-                Y:{' '}
-                <input
-                  type="range"
-                  min={-500}
-                  max={500}
-                  onChange={e =>
-                    this.setState({
-                      translateY: parseInt(e.currentTarget.value, 10),
-                    })
-                  }
-                />
-                Zoom:{' '}
-                <input
-                  type="range"
-                  min={50}
-                  max={(scaleFactors.length - 2) * 100}
-                  value={this.state.zoom}
-                  onChange={e =>
-                    this.setState({
-                      zoom: parseInt(e.currentTarget.value, 10),
-                    })
-                  }
-                />
-                {scaleFactors.map((v, k) => (
-                  <button
-                    key={k}
-                    style={{
-                      outline: 'none',
-                      background:
-                        k === this.state.currentScaleFactor
-                          ? 'lightblue'
-                          : '#fff',
+          }) => {
+            return (
+              <div>
+                <div
+                  style={{
+                    position: 'relative',
+                    zIndex: 10,
+                    background: '#fff',
+                  }}
+                >
+                  X:
+                  <input
+                    type="range"
+                    min={-500}
+                    max={500}
+                    value={this.state.translateX}
+                    onChange={e =>
+                      this.setState({
+                        translateX: parseInt(e.currentTarget.value, 10),
+                      })
+                    }
+                  />
+                  Y:
+                  <input
+                    type="range"
+                    min={-500}
+                    max={500}
+                    value={this.state.translateY}
+                    onChange={e =>
+                      this.setState({
+                        translateY: parseInt(e.currentTarget.value, 10),
+                      })
+                    }
+                  />
+                  Zoom:
+                  <input
+                    type="range"
+                    min={50}
+                    max={(scaleFactors.length - 2) * 100}
+                    value={this.state.zoom}
+                    onChange={e =>
+                      this.setState({
+                        zoom: parseInt(e.currentTarget.value, 10),
+                      })
+                    }
+                  />
+                  {scaleFactors.map((v, k) => (
+                    <button
+                      key={k}
+                      style={{
+                        outline: 'none',
+                        background:
+                          k === this.state.currentScaleFactor
+                            ? 'lightblue'
+                            : '#fff',
+                      }}
+                      onClick={() => this.setNewScaleFactor(k)}
+                    >
+                      Quality {k}
+                    </button>
+                  ))}
+                  <br />
+                  <MouseTracker
+                    onDragEnd={({ x, y }) => {
+                      this.setState({
+                        translateX: this.state.translateX - x,
+                        translateY: this.state.translateY - y,
+                      });
                     }}
-                    onClick={() => this.setNewScaleFactor(k)}
                   >
-                    Quality {k}
-                  </button>
-                ))}
-                <br />
-                {this.state.useCanvas ? (
-                  <CanvasRenderer
-                    displayWidth={displayWidth}
-                    displayHeight={displayHeight}
-                    createImage={createImage}
-                    displayMatrix={scale(this.state.zoom / 100)(
-                      translate(this.state.translateX, this.state.translateY)(
-                        displayMatrix
-                      )
-                    )}
-                  />
-                ) : (
-                  <ImageRenderer
-                    currentScaleFactor={this.state.currentScaleFactor}
-                    displayWidth={displayWidth}
-                    displayHeight={displayHeight}
-                    createImage={createImage}
-                    displayMatrix={scale(this.state.zoom / 100)(
-                      translate(this.state.translateX, this.state.translateY)(
-                        displayMatrix
-                      )
-                    )}
-                  />
-                )}
+                    {({ x, y, dragX, dragY, setRef }) => {
+                      const transformer = compose(
+                        // First make resize to fit display width
+                        displayMatrix(displayWidth, currentWidth),
+                        // Scale the whole image based on zoom
+                        scale(this.state.zoom / 100),
+                        // Apply opposite X,Y for current dragging position
+                        inverse(translate(dragX, dragY)),
+                        // Apply translation
+                        translate(this.state.translateX, this.state.translateY),
+                        // Finally, filter hidden images
+                        filter(0, 0, displayWidth, displayHeight, 100)
+                      );
+                      // const canvasTransform = compose(
+                      //   inverse(scale(currentScaleFactor)),
+                      //   transformer
+                      // );
+                      return (
+                        <div style={{ position: 'relative' }}>
+                          {this.state.useCanvas ? (
+                            <CanvasRenderer
+                              setRef={setRef}
+                              displayWidth={displayWidth}
+                              displayHeight={displayHeight}
+                              createImage={createImage}
+                              displayMatrix={transformer.transform(matrix)}
+                            />
+                          ) : (
+                            <ImageRenderer
+                              setRef={setRef}
+                              currentScaleFactor={this.state.currentScaleFactor}
+                              displayWidth={displayWidth}
+                              displayHeight={displayHeight}
+                              createImage={createImage}
+                              displayMatrix={transformer.transform(matrix)}
+                            />
+                          )}
+                        </div>
+                      );
+                    }}
+                  </MouseTracker>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          }}
         </TileSourceProvider>
       </div>
     );

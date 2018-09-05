@@ -23,7 +23,11 @@ class TileSourceProvider extends Component {
       nextProps.scaleFactor !== this.props.scaleFactor ||
       nextProps.displayWidth !== this.props.displayWidth
     ) {
-      this.setScaleFactor(nextProps.scaleFactor, nextProps.displayWidth);
+      this.setScaleFactor(
+        nextProps.scaleFactor,
+        nextProps.displayWidth,
+        this.state.scaleFactorMatrices
+      );
     }
   }
 
@@ -45,52 +49,66 @@ class TileSourceProvider extends Component {
           scaleFactors: firstTileSet.scaleFactors,
         });
 
-        this.setScaleFactor(scaleFactor, displayWidth);
+        const scaleFactorMatrices = this.createAllScaleFactors(
+          firstTileSet,
+          width,
+          height
+        );
+        this.setScaleFactor(scaleFactor, displayWidth, scaleFactorMatrices);
+        this.setState({ scaleFactorMatrices });
       });
   }
 
-  setScaleFactor(scaleFactorIndex, displayWidth) {
-    const { scaleFactors } = this.state;
-    const scaleFactor =
-      typeof scaleFactors[scaleFactorIndex] !== 'undefined'
-        ? scaleFactors[scaleFactorIndex]
-        : scaleFactors[scaleFactors.length - 1];
+  createAllScaleFactors(tileSet, width, height) {
+    return tileSet.scaleFactors.map(scaleFactor => {
+      const fullWidth = Math.ceil(width / scaleFactor);
+      const fullHeight = Math.ceil(height / scaleFactor);
 
-    const { height, width, tileSet } = this.state;
+      const tilesX = Math.ceil(fullWidth / tileSet.width);
+      const tilesY = Math.ceil(fullHeight / tileSet.height);
 
-    const fullWidth = Math.ceil(width / scaleFactor);
-    const fullHeight = Math.ceil(height / scaleFactor);
+      const matrix = math.zeros(tilesX, tilesY, 4).map((value, [x, y, z]) => {
+        const rx = x * tileSet.width;
+        const ry = y * tileSet.height;
+        switch (z) {
+          case 0:
+            return rx;
+          case 1:
+            return ry;
+          case 2:
+            return rx + tileSet.width < fullWidth
+              ? tileSet.width
+              : fullWidth - rx;
+          case 3:
+            return ry + tileSet.height < fullHeight
+              ? tileSet.height
+              : fullHeight - ry;
+        }
+      });
 
-    const tilesX = Math.ceil(fullWidth / tileSet.width);
-    const tilesY = Math.ceil(fullHeight / tileSet.height);
-
-    const emptyTileMatrix = math.zeros(tilesX, tilesY, 4);
-
-    const matrix = emptyTileMatrix.map((value, [x, y, z]) => {
-      const rx = x * tileSet.width;
-      const ry = y * tileSet.height;
-      switch (z) {
-        case 0:
-          return rx;
-        case 1:
-          return ry;
-        case 2:
-          return rx + tileSet.width < fullWidth
-            ? tileSet.width
-            : fullWidth - rx;
-        case 3:
-          return ry + tileSet.height < fullHeight
-            ? tileSet.height
-            : fullHeight - ry;
-      }
+      return {
+        scaleFactor,
+        matrix,
+        fullHeight,
+        fullWidth,
+        tilesX,
+        tilesY,
+      };
     });
+  }
+
+  setScaleFactor(scaleFactorIndex, displayWidth, scaleFactorMatrices) {
+    const { matrix, fullHeight, fullWidth, scaleFactor } =
+      typeof scaleFactorMatrices[scaleFactorIndex] !== 'undefined'
+        ? scaleFactorMatrices[scaleFactorIndex]
+        : scaleFactorMatrices[scaleFactorMatrices.length - 1];
 
     this.setState({
       currentWidth: fullWidth,
       currentHeight: fullHeight,
       matrix,
       imageResourceMatrix: matrix.map(value => value * scaleFactor),
-      displayMatrix: matrix.map((value, [x, y, v]) => {
+      displayMatrix: matrix.map(value => {
         return value * (displayWidth / fullWidth);
       }),
     });
@@ -148,7 +166,9 @@ class TileSourceProvider extends Component {
       currentHeight,
       currentScaleFactor,
       displayWidth: displayWidth,
-      displayHeight: currentHeight * (displayWidth / currentWidth),
+      displayHeight: currentHeight
+        ? currentHeight * (displayWidth / currentWidth)
+        : 0,
       matrix,
       displayMatrix,
       imageResourceMatrix,

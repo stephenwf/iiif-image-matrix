@@ -15,6 +15,7 @@ class ImageRenderer extends Component {
       createImage,
       currentScaleFactor,
     } = this.props;
+
     return (
       <div
         style={{
@@ -29,6 +30,7 @@ class ImageRenderer extends Component {
             {displayMatrix.toArray().map((row, rowId) =>
               row.map(([x, y, width, height], cellId) => (
                 <div
+                  key={`${rowId}--${cellId}`}
                   style={{
                     position: 'absolute',
                     left: x,

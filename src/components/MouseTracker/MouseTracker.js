@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { listen, value, decay, pointer } from 'popmotion';
 
 class MouseTracker extends Component {
   state = {
@@ -17,6 +18,33 @@ class MouseTracker extends Component {
     this.setState({
       containerX: left,
       containerY: top,
+    });
+
+    const sliderX = value(left, x => {
+      this.setState({ dragX: -x });
+    });
+    const sliderY = value(top, y => {
+      this.setState({ dragY: -y });
+    });
+
+    listen(this.element, 'mousedown touchstart').start(() => {
+      pointer({ x: sliderX.get() })
+        .pipe(({ x }) => x)
+        .start(sliderX);
+      pointer({ y: sliderY.get() })
+        .pipe(({ y }) => y)
+        .start(sliderY);
+    });
+
+    listen(document, 'mouseup touchend').start(() => {
+      decay({
+        from: sliderX.get(),
+        velocity: sliderX.getVelocity(),
+      }).start(sliderX);
+      decay({
+        from: sliderY.get(),
+        velocity: sliderY.getVelocity(),
+      }).start(sliderY);
     });
   };
 
@@ -61,9 +89,9 @@ class MouseTracker extends Component {
   render() {
     return (
       <div
-        onMouseMoveCapture={this.handleHover}
-        onMouseDown={this.handleMouseDown}
-        onMouseUp={this.handleMouseUp}
+        // onMouseMoveCapture={this.handleHover}
+        // onMouseDown={this.handleMouseDown}
+        // onMouseUp={this.handleMouseUp}
         ref={this.setRef}
       >
         <div style={{ pointerEvents: 'none' }}>

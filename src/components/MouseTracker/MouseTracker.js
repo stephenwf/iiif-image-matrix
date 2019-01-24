@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import panzoom from 'pan-zoom';
 
 class MouseTracker extends Component {
   state = {
@@ -9,6 +10,7 @@ class MouseTracker extends Component {
     dragX: 0,
     dragY: 0,
     mouseDown: false,
+    zoom: 100,
   };
 
   setRef = ref => {
@@ -19,6 +21,26 @@ class MouseTracker extends Component {
       containerY: top,
     });
   };
+
+  unpanzoom = () => {};
+
+  componentDidMount() {
+    this.unpanzoom = panzoom(document.body, e => {
+
+      console.log(e.x / this.state.zoom - e.dz, this.state.zoom - e.dz);
+      console.log(e.y / this.state.zoom - e.dz, this.state.zoom - e.dz);
+
+      this.setState(s => ({
+        dragX: s.dragX - e.dx + (e.dz ? e.x / this.state.zoom - e.dz : 0),
+        dragY: s.dragY - e.dy + (e.dz ? e.y / this.state.zoom - e.dz : 0),
+        zoom: s.zoom - e.dz,
+      }));
+    });
+  }
+
+  componentWillUnmount() {
+    this.unpanzoom();
+  }
 
   handleHover = ({ clientX, clientY }) => {
     if (this.element) {
@@ -46,10 +68,10 @@ class MouseTracker extends Component {
 
   handleMouseUp = () => {
     if (this.props.onDragEnd) {
-      this.props.onDragEnd({
-        x: this.state.dragX,
-        y: this.state.dragY,
-      });
+      // this.props.onDragEnd({
+      //   x: this.state.dragX,
+      //   y: this.state.dragY,
+      // });
     }
     this.setState({
       mouseDown: false,
@@ -59,11 +81,12 @@ class MouseTracker extends Component {
   };
 
   render() {
+    console.log(this.state.offsetY, this.state.offsetX);
     return (
       <div
-        onMouseMoveCapture={this.handleHover}
-        onMouseDown={this.handleMouseDown}
-        onMouseUp={this.handleMouseUp}
+        // onMouseMoveCapture={this.handleHover}
+        // onMouseDown={this.handleMouseDown}
+        // onMouseUp={this.handleMouseUp}
         ref={this.setRef}
       >
         <div style={{ pointerEvents: 'none' }}>

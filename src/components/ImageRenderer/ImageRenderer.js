@@ -3,8 +3,8 @@ import posed, { PoseGroup } from 'react-pose';
 import Draggable from 'react-draggable'; // The default
 
 const Container = posed.div({
-  enter: { opacity: 1, beforeChildren: 300 },
-  exit: { opacity: 0, delay: 300 },
+  // enter: { opacity: 1, beforeChildren: 300 },
+  // exit: { opacity: 0, delay: 300 },
 });
 
 class ImageRenderer extends Component {

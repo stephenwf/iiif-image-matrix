@@ -91,3 +91,9 @@ export const scale = factor => ({
   transform: matrix => matrix.map(value => value * factor),
   inverse: matrix => matrix.map(value => value / factor),
 });
+
+export const scaleAtOrigin = (factor, { x, y }) =>
+  compose(
+    scale(factor),
+    translate(x * factor, y * factor),
+  );

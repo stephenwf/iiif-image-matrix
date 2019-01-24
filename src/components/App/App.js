@@ -8,7 +8,7 @@ import {
   displayMatrix,
   filter,
   inverse,
-  scale,
+  scale, scaleAtOrigin,
   translate,
 } from '../../transforms';
 
@@ -142,12 +142,12 @@ class App extends Component {
                       });
                     }}
                   >
-                    {({ x, y, dragX, dragY, setRef }) => {
+                    {({ x, y, dragX, dragY, setRef, zoom }) => {
                       const transformer = compose(
                         // First make resize to fit display width
                         displayMatrix(displayWidth, currentWidth),
                         // Scale the whole image based on zoom
-                        scale(this.state.zoom / 100),
+                        scale(zoom / 100),
                         // Apply opposite X,Y for current dragging position
                         inverse(translate(dragX, dragY)),
                         // Apply translation
@@ -159,6 +159,18 @@ class App extends Component {
                       //   inverse(scale(currentScaleFactor)),
                       //   transformer
                       // );
+                      const scaleF = Math.floor(
+                        Math.abs(Math.max(0, 4 - zoom / 100))
+                      );
+                      console.log(this.state.currentScaleFactor);
+                      if (
+                        this.state.currentScaleFactor !== null &&
+                        this.state.currentScaleFactor !== scaleF
+                      ) {
+                        console.log(scaleF);
+                        this.setState(() => ({ currentScaleFactor: scaleF }));
+                      }
+                      // console.log(Math.floor(Math.abs(4 - (zoom / 200))));
                       return (
                         <div style={{ position: 'relative' }}>
                           {this.state.useCanvas ? (

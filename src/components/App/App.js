@@ -4,6 +4,7 @@ import CanvasRenderer from '../CanvasRenderer/CanvasRenderer';
 import ImageRenderer from '../ImageRenderer/ImageRenderer';
 import MouseTracker from '../MouseTracker/MouseTracker';
 import {
+  changeOrigin,
   compose,
   displayMatrix,
   filter,
@@ -143,15 +144,21 @@ class App extends Component {
                     }}
                   >
                     {({ x, y, dragX, dragY, setRef }) => {
+                      const zoom = this.state.zoom / 100;
                       const transformer = compose(
                         // First make resize to fit display width
                         displayMatrix(displayWidth, currentWidth),
                         // Scale the whole image based on zoom
-                        scale(this.state.zoom / 100),
+                        scale(zoom),
                         // Apply opposite X,Y for current dragging position
                         inverse(translate(dragX, dragY)),
                         // Apply translation
                         translate(this.state.translateX, this.state.translateY),
+                        // Change the origin.
+                        changeOrigin(
+                          { x: displayWidth / 2, y: displayHeight / 2 },
+                          zoom
+                        ),
                         // Finally, filter hidden images
                         filter(0, 0, displayWidth, displayHeight, 100)
                       );

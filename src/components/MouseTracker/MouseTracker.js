@@ -26,10 +26,6 @@ class MouseTracker extends Component {
 
   componentDidMount() {
     this.unpanzoom = panzoom(document.body, e => {
-
-      console.log(e.x / this.state.zoom - e.dz, this.state.zoom - e.dz);
-      console.log(e.y / this.state.zoom - e.dz, this.state.zoom - e.dz);
-
       this.setState(s => ({
         dragX: s.dragX - e.dx + (e.dz ? e.x / this.state.zoom - e.dz : 0),
         dragY: s.dragY - e.dy + (e.dz ? e.y / this.state.zoom - e.dz : 0),
@@ -81,7 +77,6 @@ class MouseTracker extends Component {
   };
 
   render() {
-    console.log(this.state.offsetY, this.state.offsetX);
     return (
       <div
         // onMouseMoveCapture={this.handleHover}

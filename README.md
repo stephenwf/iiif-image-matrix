@@ -1,6 +1,40 @@
+<div align="center"><img src="https://raw.githubusercontent.com/stephenwf/hyperion/master/hyperion.png" width="390" /></div>
+<br />
+
+# Moving to Hyperion
+This project will soon be part of the [Hyperion Framework](https://github.com/stephenwf/hyperion) and APIs finalised. The aim is to have a library for composing and transforming the positions of individual tiles and then building rendering and interaction components in native libraries. (Vanilla, Vue and React). Limiting the scope of the library to the data and not the UI will help it's feature set to grow. This will include some things like:
+
+* Display size driving scale factor as a transform
+* Combining 2 or more tile sources into virtual "canvases" through:
+    * Defined compositions (image annotations targeting a canvas)
+    * 2-up, 3-up, X-up views (e.g. side-by-side book view)
+    * Mosaic or tiled views
+* Rounding bugs fixed (1px gaps when scaling)
+
+The UI elements will be a declarative component with controlled inputs:
+```jsx
+<CanvasViewer 
+    tileSources={...}
+    zoom={1}
+    x={100}
+    y={200}
+    width={1000}
+    height={500}
+/>
+```
+This won't be interactive at all, and will only be a static representation of the image at that position. Interactions will be its own component, that will sit "around" the viewer and handle mouse, keyboard, touches and translate that into the correct props for the element.
+
+This will open up the possibility to use this as both a viewer for static images built up from tiles, and a deep zoom viewer. Both with a relatively small footprint.
+
+The final aim of the library, as part of the [Hyperion Framework](https://github.com/stephenwf/hyperion) is to offer a small and fast alternative to OpenSeadragon for IIIF images.
+
+The technical design and original Readme can be found below.
+
+<hr />
+
+
 # IIIF Viewer Matrix
 A simple implementation of the IIIF Image 2.0 specification. 
-
 
 ## Pipeline
 A using application provides the `TileSourceProvider` with an image service

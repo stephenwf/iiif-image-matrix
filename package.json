@@ -39,6 +39,7 @@
     "react-dom": "^16.8.3",
     "react-draggable": "^3.0.5",
     "react-pose": "^3.0.2",
+    "rxjs": "^6.4.0",
     "webpack-config": "^7.5.0"
   }
 }

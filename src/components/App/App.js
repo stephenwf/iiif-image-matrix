@@ -13,6 +13,29 @@ import {
   translate,
 } from '../../transforms';
 
+import { map, mergeMap, takeUntil } from 'rxjs/operators';
+import { fromEvent } from 'rxjs';
+
+import * as math from 'mathjs';
+// RXJS Testing.
+
+const move$ = fromEvent(document, 'mousemove');
+const down$ = fromEvent(document, 'mousedown');
+const up$ = fromEvent(document, 'mouseup');
+const paints$ = down$.pipe(mergeMap(down => move$.pipe(takeUntil(up$))));
+
+const matrix$ = paints$.pipe(map(ev => translate(ev.screenX, ev.screenY)));
+
+// const log = x => console.log(x);
+matrix$.subscribe(c =>
+  console.log(c.transform(math.matrix([
+    [
+      // Row 1.
+      [0, 0, 100, 100, 0.390625],
+    ],
+  ])).valueOf()[0][0])
+);
+
 class App extends Component {
   state = {
     activeTileSource: 'https://view.nls.uk/iiif/7443/74438561.5/info.json',
@@ -163,12 +186,10 @@ class App extends Component {
                       const scaleF = Math.floor(
                         Math.abs(Math.max(0, 4 - zoom / 100))
                       );
-                      console.log(this.state.currentScaleFactor);
                       if (
                         this.state.currentScaleFactor !== null &&
                         this.state.currentScaleFactor !== scaleF
                       ) {
-                        console.log(scaleF);
                         this.setState(() => ({ currentScaleFactor: scaleF }));
                       }
                       // console.log(Math.floor(Math.abs(4 - (zoom / 200))));

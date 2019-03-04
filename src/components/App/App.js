@@ -8,7 +8,8 @@ import {
   displayMatrix,
   filter,
   inverse,
-  scale, scaleAtOrigin,
+  scale,
+  scaleAtOrigin,
   translate,
 } from '../../transforms';
 

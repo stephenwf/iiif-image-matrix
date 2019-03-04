@@ -43,6 +43,7 @@ class ImageRenderer extends Component {
                   >
                     {shouldRender ? (
                       <img
+                        className="image-tile"
                         style={{ width: '100%' }}
                         src={createImage(rowId, cellId)}
                       />

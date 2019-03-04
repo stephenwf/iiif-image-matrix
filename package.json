@@ -6,19 +6,37 @@
   "scripts": {
     "start": "fesk-start",
     "build": "fesk-build",
-    "watch": "fesk-watch"
+    "watch": "fesk-watch",
+    "test": "jest"
   },
   "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-react": "^7.0.0",
     "@fesk/scripts": "^1.1.0",
-    "@types/mathjs": "^4.4.1"
+    "@types/jest": "^24.0.9",
+    "@types/mathjs": "^4.4.1",
+    "babel-jest": "^24.1.0",
+    "jest": "^24.1.0"
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/coverage/",
+      "(.test)\\.(ts|tsx|js)$",
+      ".json"
+    ],
+    "transform": {
+      "^.+\\.jsx?$": "./jest.transform.js"
+    }
   },
   "dependencies": {
     "@gfodor/react-canvas": "https://github.com/gfodor/react-canvas.git",
     "map-the-tiles": "^1.2.1",
     "mathjs": "^5.1.1",
     "pan-zoom": "^3.4.0",
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
     "react-draggable": "^3.0.5",
     "react-pose": "^3.0.2",
     "webpack-config": "^7.5.0"

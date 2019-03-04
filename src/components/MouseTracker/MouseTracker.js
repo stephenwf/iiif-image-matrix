@@ -89,7 +89,7 @@ class MouseTracker extends Component {
         // onMouseUp={this.handleMouseUp}
         ref={this.setRef}
       >
-        <div style={{ pointerEvents: 'none' }}>
+        <div style={{ pointerEvents: 'visible' }}>
           {this.props.children({ ...this.state })}
         </div>
       </div>

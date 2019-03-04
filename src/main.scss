@@ -13,4 +13,12 @@ body, html {
     background: #eee;
   }
 }
-      
+
+.image-tile{
+  position: relative;
+  z-index: 1;
+}
+.image-tile:hover {
+  outline: 1px solid crimson;
+  z-index: 2;
+}

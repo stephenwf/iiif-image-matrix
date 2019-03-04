@@ -80,7 +80,7 @@ export const compose = (...transforms) => ({
     );
   },
   inverse: matrix => {
-    return this.transforms.reduceRight(
+    return transforms.reduceRight(
       (result, nextTransform) => nextTransform.inverse(result),
       matrix
     );
@@ -95,5 +95,5 @@ export const scale = factor => ({
 export const scaleAtOrigin = (factor, { x, y }) =>
   compose(
     scale(factor),
-    translate(x * factor, y * factor),
+    translate(x * factor, y * factor)
   );
